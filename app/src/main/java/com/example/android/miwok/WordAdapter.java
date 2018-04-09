@@ -77,13 +77,6 @@ public class WordAdapter extends ArrayAdapter<Word> {
      //           });
      //       }
      //   });
-
-
-
-        Log.i("WordAdaptor", "Image id is:" + currentWord.getmImageResourceId());
-        Log.i("WordAdaptor", "testcolorId is" + mColorResourceId);
-        Log.i("WordAdaptor", "testLayoutcolor is" + textLayoutColor);
-
         return listView;
     }
 }
