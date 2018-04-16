@@ -27,7 +27,7 @@ public class WordAdapter extends ArrayAdapter<Word> {
     private int mColorResourceId;
 
 
-    public WordAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Word> words, int colorResourceId) {
+    WordAdapter(@NonNull Context context, int resource, @NonNull ArrayList<Word> words, int colorResourceId) {
         super(context, 0, words);
         mColorResourceId = colorResourceId;
     }
@@ -53,30 +53,29 @@ public class WordAdapter extends ArrayAdapter<Word> {
         View textLayout = listView.findViewById(R.id.text_layout);
         int textLayoutColor = ContextCompat.getColor(getContext(), mColorResourceId);
         textLayout.setBackgroundColor(textLayoutColor);
-       //textLayout.setBackgroundColor(mColorResourceId);
+        //textLayout.setBackgroundColor(mColorResourceId);
 
         ImageView imageView = listView.findViewById(R.id.image);
-        if(currentWord.hasImage()){
+        if (currentWord.hasImage()) {
             imageView.setImageResource(currentWord.getmImageResourceId());
             imageView.setVisibility(View.VISIBLE);
-        }
-            else{
+        } else {
             imageView.setVisibility(View.GONE);
         }
 
-    //    listView.setOnClickListener(new View.OnClickListener() {
-    //        @Override
-     //   public void onClick(View v) {
-     //           final MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), currentWord.getmVoiceResouorceId());
-    //            mediaPlayer.start();
-     //           mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-     //               @Override
-     //               public void onCompletion(MediaPlayer mp) {
-     //                   mediaPlayer.release();
-     //               }
-     //           });
-     //       }
-     //   });
+        //    listView.setOnClickListener(new View.OnClickListener() {
+        //        @Override
+        //   public void onClick(View v) {
+        //           final MediaPlayer mediaPlayer = MediaPlayer.create(getContext(), currentWord.getmVoiceResouorceId());
+        //            mediaPlayer.start();
+        //           mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        //               @Override
+        //               public void onCompletion(MediaPlayer mp) {
+        //                   mediaPlayer.release();
+        //               }
+        //           });
+        //       }
+        //   });
         return listView;
     }
 }

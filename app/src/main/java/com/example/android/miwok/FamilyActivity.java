@@ -22,14 +22,6 @@ public class FamilyActivity extends AppCompatActivity {
 
     MediaPlayer mMediaPlayer;
     AudioManager mAudioManager;
-
-    MediaPlayer.OnCompletionListener mCompleteListener = new MediaPlayer.OnCompletionListener() {
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-            releaseMediaPlayer();
-        }
-    };
-
     AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
@@ -41,6 +33,12 @@ public class FamilyActivity extends AppCompatActivity {
             } else if (focusChange == AUDIOFOCUS_GAIN) {
                 mMediaPlayer.start();
             }
+        }
+    };
+    MediaPlayer.OnCompletionListener mCompleteListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            releaseMediaPlayer();
         }
     };
 
@@ -104,7 +102,7 @@ public class FamilyActivity extends AppCompatActivity {
             mMediaPlayer = null;
             mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
-         //mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
+        //mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
 
     }
 }

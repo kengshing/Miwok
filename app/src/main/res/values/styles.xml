@@ -32,14 +32,14 @@
     </style>
 
     <style name="MiworkTextStyle">
-       <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
     </style>
 
     <style name="DefaultTextStyle">
         <item name="android:textColor">@android:color/white</item>
-               <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
     </style>
 
 
