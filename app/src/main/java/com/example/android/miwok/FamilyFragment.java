@@ -1,15 +1,19 @@
 package com.example.android.miwok;
 
+
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import static android.content.Context.AUDIO_SERVICE;
 import static android.media.AudioManager.AUDIOFOCUS_GAIN;
 import static android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS;
@@ -18,34 +22,48 @@ import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK;
 import static android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
 import static android.media.AudioManager.STREAM_MUSIC;
 
-public class FamilyActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class FamilyFragment extends Fragment {
 
-    MediaPlayer mMediaPlayer;
-    AudioManager mAudioManager;
-    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+    private MediaPlayer mMediaPlayer;
+    private AudioManager mAudioManager;
+    private final AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
-            } else if (focusChange == AUDIOFOCUS_LOSS) {
-                releaseMediaPlayer();
-            } else if (focusChange == AUDIOFOCUS_GAIN) {
-                mMediaPlayer.start();
+            switch (focusChange) {
+                case AUDIOFOCUS_LOSS_TRANSIENT:
+                case AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    mMediaPlayer.pause();
+                    mMediaPlayer.seekTo(0);
+                    break;
+                case AUDIOFOCUS_LOSS:
+                    releaseMediaPlayer();
+                    break;
+                case AUDIOFOCUS_GAIN:
+                    mMediaPlayer.start();
+                    break;
             }
         }
     };
-    MediaPlayer.OnCompletionListener mCompleteListener = new MediaPlayer.OnCompletionListener() {
+    private final MediaPlayer.OnCompletionListener mCompleteListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
             releaseMediaPlayer();
         }
     };
 
+
+    public FamilyFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.word_list);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.word_list, container, false);
 
         final ArrayList<Word> words = new ArrayList<>();
         words.add(new Word("father", "apa", R.raw.family_father, R.drawable.family_father));
@@ -59,8 +77,8 @@ public class FamilyActivity extends AppCompatActivity {
         words.add(new Word("grandmother", "ama", R.raw.family_grandfather, R.drawable.family_grandfather));
         words.add(new Word("grandfather", "pappa", R.raw.family_grandmother, R.drawable.family_grandmother));
 
-        WordAdapter itemAdapter = new WordAdapter(this, R.layout.list_item, words, R.color.category_family);
-        ListView listView = findViewById(R.id.list);
+        WordAdapter itemAdapter = new WordAdapter(getActivity(), R.layout.list_item, words, R.color.category_family);
+        ListView listView = rootView.findViewById(R.id.list);
         listView.setAdapter(itemAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,20 +87,22 @@ public class FamilyActivity extends AppCompatActivity {
                 Word word = words.get(position);
                 releaseMediaPlayer();
                 //AudioFocus
-                mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+                mAudioManager = (AudioManager) getActivity().getSystemService(AUDIO_SERVICE);
                 int audioFocusGrant = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, STREAM_MUSIC, AUDIOFOCUS_GAIN_TRANSIENT);
                 if (audioFocusGrant == AUDIOFOCUS_REQUEST_GRANTED) {
-                    mMediaPlayer = MediaPlayer.create(FamilyActivity.this, word.getmVoiceResouorceId());
+                    mMediaPlayer = MediaPlayer.create(getActivity(), word.getmVoiceResouorceId());
                     mMediaPlayer.setVolume(1, 1);
                     mMediaPlayer.start();
                     mMediaPlayer.setOnCompletionListener(mCompleteListener);
                 }
             }
         });
+
+        return rootView;
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         releaseMediaPlayer();
     }

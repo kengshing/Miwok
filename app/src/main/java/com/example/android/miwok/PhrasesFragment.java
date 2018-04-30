@@ -1,49 +1,66 @@
 package com.example.android.miwok;
 
+
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-
 import java.util.ArrayList;
 
+import static android.content.Context.AUDIO_SERVICE;
 import static android.media.AudioManager.AUDIOFOCUS_GAIN;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
 import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK;
 import static android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
 
-public class PhrasesActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class PhrasesFragment extends Fragment {
 
-    MediaPlayer mMediaPlayer;
-    AudioManager mAudioManager;
-    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+    private MediaPlayer mMediaPlayer;
+    private AudioManager mAudioManager;
+    private final AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                mMediaPlayer.pause();
-                mMediaPlayer.seekTo(0);
-            } else if (focusChange == AUDIOFOCUS_LOSS) {
-                releaseMediaPlayer();
-            } else if (focusChange == AUDIOFOCUS_GAIN) {
-                mMediaPlayer.start();
+            switch (focusChange) {
+                case AUDIOFOCUS_LOSS_TRANSIENT:
+                case AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    mMediaPlayer.pause();
+                    mMediaPlayer.seekTo(0);
+                    break;
+                case AUDIOFOCUS_LOSS:
+                    releaseMediaPlayer();
+                    break;
+                case AUDIOFOCUS_GAIN:
+                    mMediaPlayer.start();
+                    break;
             }
         }
     };
-    MediaPlayer.OnCompletionListener mCompleteListener = new MediaPlayer.OnCompletionListener() {
+    private final MediaPlayer.OnCompletionListener mCompleteListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
             releaseMediaPlayer();
         }
     };
 
+
+    public PhrasesFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.word_list);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.word_list, container, false);
 
         final ArrayList<Word> words = new ArrayList<>();
         words.add(new Word("Where are you going?", "minto wuksus", R.raw.phrase_where_are_you_going));
@@ -57,8 +74,8 @@ public class PhrasesActivity extends AppCompatActivity {
         words.add(new Word("Let's go.", "yoowutis", R.raw.phrase_lets_go));
         words.add(new Word("Come here.", "enninem", R.raw.phrase_come_here));
 
-        WordAdapter itemAdapter = new WordAdapter(this, R.layout.list_item, words, R.color.category_phrases);
-        ListView listView = findViewById(R.id.list);
+        WordAdapter itemAdapter = new WordAdapter(getActivity(), R.layout.list_item, words, R.color.category_phrases);
+        ListView listView = rootView.findViewById(R.id.list);
         listView.setAdapter(itemAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -68,21 +85,23 @@ public class PhrasesActivity extends AppCompatActivity {
                 releaseMediaPlayer();
 
                 //AudioFocus
-                mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+                mAudioManager = (AudioManager) getActivity().getSystemService(AUDIO_SERVICE);
 
                 int audioFocusGrant = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
                 if (audioFocusGrant == AUDIOFOCUS_REQUEST_GRANTED) {
-                    mMediaPlayer = MediaPlayer.create(PhrasesActivity.this, word.getmVoiceResouorceId());
+                    mMediaPlayer = MediaPlayer.create(getActivity(), word.getmVoiceResouorceId());
                     mMediaPlayer.setVolume(1, 1);
                     mMediaPlayer.start();
                     mMediaPlayer.setOnCompletionListener(mCompleteListener);
                 }
             }
         });
+
+        return rootView;
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         releaseMediaPlayer();
     }
